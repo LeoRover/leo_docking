@@ -11,6 +11,9 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+
   <exec_depend>smach</exec_depend>
   <exec_depend>smach_ros</exec_depend>
   <exec_depend>python3-pykdl</exec_depend>
@@ -18,6 +21,7 @@
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>nav_msgs</exec_depend>
   <exec_depend>aruco_opencv</exec_depend>
-  <depend>actionlib</depend>
+  <exec_depend>nodelet</exec_depend>
+
   <depend>actionlib_msgs</depend>
 </package>
