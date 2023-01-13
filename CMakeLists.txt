@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(leo_docking)
 
-find_package(catkin REQUIRED 
+find_package(catkin REQUIRED COMPONENTS
   genmsg 
   actionlib_msgs
 )
