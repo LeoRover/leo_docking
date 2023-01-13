@@ -126,10 +126,7 @@ class CheckArea(smach.State):
             self.marker, self.docking_distance
         )
 
-        target_pose = PyKDL.Frame(
-            PyKDL.Rotation.Quaternion(*orientation),
-            point,
-        )
+        target_pose = PyKDL.Frame(PyKDL.Rotation.Quaternion(*orientation), point)
 
         self.marker_sub.unregister()
 

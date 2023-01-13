@@ -283,7 +283,7 @@ def calculate_threshold_distances(marker: MarkerPose) -> tuple[float, float]:
     x = (perpend_coeff_b - coeff_b) / (coeff_a - perpend_coeff_a)
     y = coeff_a * x + coeff_b
 
-    y_dist = math.sqrt(x**2 + y**2)
+    y_dist = math.sqrt(x ** 2 + y ** 2)
 
     x_dist = math.sqrt((x - position.x()) ** 2 + (y - position.y()) ** 2)
 
