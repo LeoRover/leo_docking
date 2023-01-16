@@ -7,13 +7,14 @@ import numpy as np
 import rospy
 import tf2_ros
 import smach
-import PyKDL
 
 from aruco_opencv_msgs.msg import MarkerDetection, MarkerPose
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Float32
 from sensor_msgs.msg import JointState
+
+import PyKDL
 
 from leo_docking.utils import (
     get_location_points_from_marker,
@@ -23,7 +24,6 @@ from leo_docking.utils import (
     translate,
     normalize_marker,
 )
-
 
 class BaseDockingState(smach.State):
     """Base class for the sequence states of the sub-state machine responsible

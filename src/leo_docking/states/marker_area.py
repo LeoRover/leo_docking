@@ -3,11 +3,12 @@ from threading import Event, Lock
 
 import rospy
 import smach
-import PyKDL
 
 from aruco_opencv_msgs.msg import MarkerDetection, MarkerPose
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
+
+import PyKDL
 
 from leo_docking.utils import (
     translate,
