@@ -1,5 +1,6 @@
 import math
 from threading import Event, Lock
+from typing import Optional
 
 import rospy
 import smach
@@ -209,7 +210,7 @@ class BaseDockAreaState(smach.State):
         """
         raise NotImplementedError()
 
-    def movement_loop(self, route_left: float, angle: bool = True) -> None:
+    def movement_loop(self, route_left: float, angle: bool = True) -> Optional[str]:
         """Function performing rover movement; invoked in the "execute" method of the state.
 
         Args:

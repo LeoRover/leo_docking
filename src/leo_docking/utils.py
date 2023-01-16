@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Tuple
 
 import math
 
@@ -96,7 +97,7 @@ def normalize_marker(marker: MarkerPose) -> PyKDL.Frame:
 
 def get_location_points_from_marker(
     marker: MarkerPose, distance: float = 0.0
-) -> tuple[PyKDL.Vector, tuple[float, float, float, float]]:
+) -> Tuple[PyKDL.Vector, Tuple[float, float, float, float]]:
     """Function calculating from detected marker a pose and orientation that rover should have
     before riding on the docking station.
 
@@ -261,7 +262,7 @@ def translate(value, left_min, left_max, right_min, right_max) -> float:
     return ans
 
 
-def calculate_threshold_distances(marker: MarkerPose) -> tuple[float, float]:
+def calculate_threshold_distances(marker: MarkerPose) -> Tuple[float, float]:
     """Function calculating the distance from rover to marker sight
     (x axis of the marker frame) and how far on the marker's x axis the rover is.
     which are needed for the area threshold checking.

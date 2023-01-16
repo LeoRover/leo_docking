@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Optional
 from threading import Lock, Event
 from queue import Queue
 import math
@@ -85,7 +86,7 @@ class BaseDockingState(smach.State):
         """
         raise NotImplementedError()
 
-    def movement_loop(self) -> None:
+    def movement_loop(self) -> Optional[str]:
         """Function performing rover movement; invoked in the "execute" method of the state."""
         msg = Twist()
         rate = rospy.Rate(10)
@@ -142,12 +143,11 @@ class BaseDockingState(smach.State):
         if len(data.markers) == 0:
             return
 
+        marker: MarkerPose
         for marker in data.markers:
             if marker.marker_id == self.marker_id:
                 if not self.marker_flag.is_set():
                     self.marker_flag.set()
-
-                marker: MarkerPose = data.markers[0]
 
                 if self.debug:
                     (
@@ -404,7 +404,7 @@ class ReachingDockingPoint(BaseDockingState):
         )
         self.bias_direction = 0.0
 
-    def movement_loop(self):
+    def movement_loop(self) -> Optional[str]:
         msg = Twist()
         rate = rospy.Rate(10)
 
@@ -437,6 +437,7 @@ class ReachingDockingPoint(BaseDockingState):
             rate.sleep()
 
         self.vel_pub.publish(Twist())
+        return None
 
     def calculate_route_left(self, marker: MarkerPose):
         docking_point, _ = get_location_points_from_marker(
@@ -657,7 +658,7 @@ class DockingRover(BaseDockingState):
 
             self.effort_buf.put_nowait(effort_sum)
 
-    def movement_loop(self):
+    def movement_loop(self) -> Optional[str]:
         """Function performing rover movement; invoked in the "execute" method of the state."""
         rospy.loginfo("Waiting for motors effort and battery voltage to drop.")
         rospy.sleep(rospy.Duration(secs=1.0))
@@ -733,6 +734,7 @@ class DockingRover(BaseDockingState):
         self.vel_pub.publish(Twist())
         self.battery_sub.unregister()
         self.joint_state_sub.unregister()
+        return None
 
     def calculate_route_left(self, marker: MarkerPose) -> None:
         normalized_marker = normalize_marker(marker)
