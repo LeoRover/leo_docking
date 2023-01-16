@@ -39,7 +39,8 @@ def frame_to_pose(frame: PyKDL.Frame) -> Pose:
 
 
 def pose_to_frame(pose: Pose) -> PyKDL.Frame:
-    """Function converting rospy Pose object to PyKDL Frame object (hardcodes z coordinate equal to 0.0).
+    """Function converting rospy Pose object to PyKDL Frame object (hardcodes z coordinate equal
+    to 0.0).
 
     Args:
         pose: rospy Pose to be converted
@@ -66,8 +67,9 @@ def pose_to_frame(pose: Pose) -> PyKDL.Frame:
 def normalize_marker(marker: MarkerPose) -> PyKDL.Frame:
     """Function normalizig pose of detected marker in base_link frame:
     - position: puts marker on level z = 0.0.
-    - orientation: calculates marker's yaw from unit vector z (vector looking in z axis) in respect to marker with arctangent,
-                   and normalizes the orientation - makes marker have x,y,z axis in the same scheme as rover has (x, y, z - forward, left, up).
+    - orientation: calculates marker's yaw from unit vector z (vector looking in z axis) in respect
+                   to marker with arctangent, and normalizes the orientation - makes marker have
+                   x,y,z axis in the same scheme as rover has (x, y, z - forward, left, up).
 
     Args:
         marker: pose of detected marker used for localization of docking station
@@ -95,15 +97,19 @@ def normalize_marker(marker: MarkerPose) -> PyKDL.Frame:
 def get_location_points_from_marker(
     marker: MarkerPose, distance: float = 0.0
 ) -> tuple[PyKDL.Vector, tuple[float, float, float, float]]:
-    """Function calculating from detected marker a pose and orientation that rover should have before riding on the docking station.
+    """Function calculating from detected marker a pose and orientation that rover should have
+    before riding on the docking station.
 
     Args:
         marker: pose of the marker used for calculating the final pose and orientation
-        distance: distance (in meters) of the desired position from the marker on the docking station
+        distance: distance (in meters) of the desired position from the marker on the docking
+                  station
 
     Returns:
-        docking_point: point in front of the docking station away by `distance` - point where rover can freely rotate without moving docking station
-        docking_orientation: target orientation of the rover before reaching docking station; tuple representing quaternion (x, y, z, w)
+        docking_point: point in front of the docking station away by `distance` - point where rover
+                       can freely rotate without moving docking station
+        docking_orientation: target orientation of the rover before reaching docking station; tuple
+                             representing quaternion (x, y, z, w)
     """
     marker_frame = normalize_marker(marker)
 
@@ -129,7 +135,8 @@ def calculate_odom_diff_pose(
         current_odom_pose: current odometry pose of robot
 
     Returns:
-        diff_pose: difference pose; represents distance and rotation made from `start_odom_pose` to `current_odom_pose`
+        diff_pose: difference pose; represents distance and rotation made from `start_odom_pose` to
+                   `current_odom_pose`
     """
 
     start_odom_frame = pose_to_frame(start_odom_pose.pose.pose).Inverse()

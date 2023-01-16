@@ -118,7 +118,10 @@ class CheckArea(smach.State):
 
         if self.check_threshold(x_dist, y_dist):
             self.marker_sub.unregister()
-            user_data.action_feedback.current_state = f"{self.state_log_name}: docking possible from current position. Proceeding to 'Reaching Docking Point` sequence."
+            user_data.action_feedback.current_state = (
+                f"{self.state_log_name}: docking possible from current position. "
+                f"Proceeding to 'Reaching Docking Point` sequence."
+            )
             return "docking_area"
 
         # getting target pose
@@ -133,7 +136,10 @@ class CheckArea(smach.State):
         # passing calculated data to next states
         user_data.target_pose = target_pose
 
-        user_data.action_feedback.current_state = f"{self.state_log_name}: docking impossible from current position. Proceeding to 'Reaching Docking Area` sequence."
+        user_data.action_feedback.current_state = (
+            f"{self.state_log_name}: docking impossible from current position. "
+            f"Proceeding to 'Reaching Docking Area` sequence."
+        )
         return "outside_docking_area"
 
 
@@ -195,7 +201,8 @@ class BaseDockAreaState(smach.State):
         from target pose.
 
         Args:
-            target_pose: (PyKDL.Frame) target pose of the rover at the end of the docking phase (sub-state machine)
+            target_pose: (PyKDL.Frame) target pose of the rover at the end of the docking phase
+                         (sub-state machine)
         Returns:
             route_left: (float) calculated route that is left to traverse
         """
@@ -285,7 +292,10 @@ class BaseDockAreaState(smach.State):
         if self.output_len > 0:
             user_data.target_pose = target_pose
 
-        user_data.action_feedback.current_state = f"'Reaching Docking Area`: sequence completed. Proceeding to 'Check Area' state."
+        user_data.action_feedback.current_state = (
+            f"'Reaching Docking Area`: sequence completed. "
+            f"Proceeding to 'Check Area' state."
+        )
         return "succeeded"
 
     def wheel_odom_callback(self, data: Odometry) -> None:
@@ -313,7 +323,8 @@ class BaseDockAreaState(smach.State):
 
 class RotateToDockArea(BaseDockAreaState):
     """The first state of the sequence state machine getting rover to docking area;
-    responsible for rotating the rover towards target point in the area (default: 2m in straight line from docking base)."""
+    responsible for rotating the rover towards target point in the area (default: 2m in straight
+    line from docking base)."""
 
     def __init__(
         self,
@@ -361,7 +372,8 @@ class RotateToDockArea(BaseDockAreaState):
 
 class RideToDockArea(BaseDockAreaState):
     """The second state of the sequence state machine getting rover to docking area;
-    responsible for driving the rover to the target point in the area (default: 2m in straight line from docking base)"""
+    responsible for driving the rover to the target point in the area (default: 2m in straight line
+    from docking base)"""
 
     def __init__(
         self,
@@ -455,7 +467,8 @@ class RotateToMarker(BaseDockAreaState):
         position: PyKDL.Vector = target_pose.p
         # calculating rotation done in the first state of sequence
         angle_done = math.atan2(position.y(), position.x())
-        # rotating target pose by -angle, so the target orientation is looking at marker again (initial target pose is in the `base_link` frame)
+        # rotating target pose by -angle, so the target orientation is looking at marker again
+        # (initial target pose is in the `base_link` frame)
         target_pose.M.DoRotZ(-angle_done)
         route_left = target_pose.M.GetRPY()[2]
 

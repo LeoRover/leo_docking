@@ -121,8 +121,8 @@ class BaseDockingState(smach.State):
     def calculate_route_done(
         self, odom_reference: Odometry, current_odom: Odometry
     ) -> None:
-        """Function calculating route done (either angle, or distance)
-        from the odometry message saved in marker callback (odom_reference), to the current position.
+        """Function calculating route done (either angle, or distance) from the odometry message
+        saved in marker callback (odom_reference), to the current position.
         Saves the calculated route in a class variable "route_done".
 
         Args:
@@ -136,8 +136,8 @@ class BaseDockingState(smach.State):
 
     def marker_callback(self, data: MarkerDetection) -> None:
         """Function called every time, there is new MarkerDetection message published on the topic.
-        Calculates the route left from the detected marker, set's odometry reference,
-        and (if specified), sends debug tf's so you can visualize calculated target position in rviz.
+        Calculates the route left from the detected marker, set's odometry reference, and
+        (if specified), sends debug tf's so you can visualize calculated target position in rviz.
         """
         if len(data.markers) == 0:
             return
@@ -187,7 +187,8 @@ class BaseDockingState(smach.State):
 
     def wheel_odom_callback(self, data: Odometry) -> None:
         """Function called every time, there is new Odometry message published on the topic.
-        Calculates the route done from the referance message saved in marker callback, and the current odometry pose.
+        Calculates the route done from the referance message saved in marker callback,
+        and the current odometry pose.
         """
         if not self.odom_flag.is_set():
             self.odom_flag.set()
@@ -253,7 +254,10 @@ class BaseDockingState(smach.State):
         self.marker_sub.unregister()
         self.vel_pub.unregister()
 
-        user_data.action_feedback.current_state = f"'Reaching Docking Point': sequence completed. Proceeding to 'Docking Rover' state."
+        user_data.action_feedback.current_state = (
+            f"'Reaching Docking Point': sequence completed. "
+            f"Proceeding to 'Docking Rover' state."
+        )
         if self.state_log_name == "Docking Rover":
             user_data.action_result.result = "docking succeeded. Rover docked."
         return "succeeded"
@@ -272,7 +276,9 @@ class BaseDockingState(smach.State):
 
 class RotateToDockingPoint(BaseDockingState):
     """The first state of the sequence state machine getting rover to docking position;
-    responsible for rotating the rover towards the target point (default: 0.6m in straight line from docking base)."""
+    responsible for rotating the rover towards the target point.
+    (default: 0.6m in straight line from docking base).
+    """
 
     def __init__(
         self,
@@ -332,8 +338,11 @@ class RotateToDockingPoint(BaseDockingState):
 
 class ReachingDockingPoint(BaseDockingState):
     """The second state of the sequence state machine getting rover to docking position;
-    responsible for driving the rover to the target docking point (default: 0.6m in straight line from docking base).
-    Performs linear and angular movement, as it fixes it's orientation to be alwas looking on the docking point."""
+    responsible for driving the rover to the target docking point
+    (default: 0.6m in straight line from docking base).
+    Performs linear and angular movement, as it fixes it's orientation
+    to be always looking on the docking point.
+    """
 
     def __init__(
         self,
@@ -451,8 +460,9 @@ class ReachingDockingPoint(BaseDockingState):
 
 class ReachingDockingOrientation(BaseDockingState):
     """The third state of the sequence state machine getting rover to docking position;
-    responsible for rotating the rover toward marker on the docking base - a position where the rover needs
-    just to drive forward to reach the base"""
+    responsible for rotating the rover toward marker on the docking base - a position where the
+    rover needs just to drive forward to reach the base.
+    """
 
     def __init__(
         self,
@@ -521,9 +531,11 @@ class ReachingDockingOrientation(BaseDockingState):
 
 
 class DockingRover(BaseDockingState):
-    """State performing final phase of the docking - reaching the base. Drives the rover forward unitl one of three condition is satisfied:
-    - rover is close enoguh to the marker located on the docking base
-    - the voltage on the topic with battery data is higher than the average collected before docking (if the average was low enough at the beggining)
+    """State performing final phase of the docking - reaching the base.
+    Drives the rover forward unitl one of three condition is satisfied:
+    - rover is close enough to the marker located on the docking base
+    - the voltage on the topic with battery data is higher than the average collected before docking
+    (if the average was low enough at the beggining)
     - the effort on the wheel motors is high enough - the rover is pushing against the base
     """
 
@@ -628,7 +640,8 @@ class DockingRover(BaseDockingState):
 
     def effort_callback(self, data: JointState) -> None:
         """Function called every time, there is new JointState message published on the topic.
-        Calculates the sum of efforts on the wheel motors, and checks the wheel effort stop condition.
+        Calculates the sum of efforts on the wheel motors, and checks the wheel effort stop
+        condition.
         """
         with self.effort_lock:
             effort_sum = 0.0

@@ -80,5 +80,8 @@ class StartState(smach.State):
 
         self.marker_sub.unregister()
 
-        user_data.action_feedback.current_state = f"{self.state_log_name}: marker with id: {self.marker_id} found. Proceeding to 'Check Area' state."
+        user_data.action_feedback.current_state = (
+            f"{self.state_log_name}: marker with id: {self.marker_id} found. "
+            f"Proceeding to 'Check Area' state."
+        )
         return "marker_found"
