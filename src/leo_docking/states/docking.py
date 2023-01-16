@@ -73,7 +73,7 @@ class BaseDockingState(smach.State):
         # debug variables
         self.debug = debug
         self.seq = 0
-        self.br = tf2_ros.TransformBroadcaster()
+        self.tf_broadcaster = tf2_ros.TransformBroadcaster()
 
     def calculate_route_left(self, marker: MarkerPose) -> None:
         """Function calculating route left (either angle left to target or linear distance)
@@ -88,7 +88,7 @@ class BaseDockingState(smach.State):
     def movement_loop(self) -> None:
         """Function performing rover movement; invoked in the "execute" method of the state."""
         msg = Twist()
-        r = rospy.Rate(10)
+        rate = rospy.Rate(10)
 
         while True:
             with self.route_lock:
@@ -113,7 +113,7 @@ class BaseDockingState(smach.State):
                     return "preempted"
 
                 self.vel_pub.publish(msg)
-            r.sleep()
+            rate.sleep()
 
         self.vel_pub.publish(Twist())
         return None
@@ -162,17 +162,17 @@ class BaseDockingState(smach.State):
                         "base_link",
                         "docking_point",
                         self.seq,
-                        self.br,
+                        self.tf_broadcaster,
                     )
 
-                    m = normalize_marker(marker)
+                    marker_normalized = normalize_marker(marker)
                     visualize_position(
-                        m.p,
-                        m.M.GetQuaternion(),
+                        marker_normalized.p,
+                        marker_normalized.M.GetQuaternion(),
                         "base_link",
                         "normalized_marker",
                         self.seq,
-                        self.br,
+                        self.tf_broadcaster,
                     )
 
                     self.seq += 1
@@ -406,7 +406,7 @@ class ReachingDockingPoint(BaseDockingState):
 
     def movement_loop(self):
         msg = Twist()
-        r = rospy.Rate(10)
+        rate = rospy.Rate(10)
 
         while True:
             with self.route_lock:
@@ -434,7 +434,7 @@ class ReachingDockingPoint(BaseDockingState):
                     return "preempted"
 
                 self.vel_pub.publish(msg)
-            r.sleep()
+            rate.sleep()
 
         self.vel_pub.publish(Twist())
 
@@ -673,17 +673,17 @@ class DockingRover(BaseDockingState):
             "joint_states", JointState, self.effort_callback, queue_size=1
         )
 
-        r = rospy.Rate(5)
+        rate = rospy.Rate(5)
 
         # waiting for the end of colleting data
         rospy.loginfo("Measuring battery data...")
         while rospy.Time.now() < self.end_time:
-            r.sleep()
+            rate.sleep()
 
         rospy.loginfo("Batery voltage average level calculated. Performing docking.")
 
         msg = Twist()
-        r = rospy.Rate(10)
+        rate = rospy.Rate(10)
 
         while True:
             with self.battery_lock:
@@ -728,7 +728,7 @@ class DockingRover(BaseDockingState):
                     return "preempted"
 
                 self.vel_pub.publish(msg)
-            r.sleep()
+            rate.sleep()
 
         self.vel_pub.publish(Twist())
         self.battery_sub.unregister()

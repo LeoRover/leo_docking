@@ -196,7 +196,7 @@ def visualize_position(
     frame_id: str,
     child_frame_id: str,
     seq: int,
-    br: tf2_ros.TransformBroadcaster,
+    tf_broadcaster: tf2_ros.TransformBroadcaster,
 ) -> None:
     """Function used for visualizing poses in rviz as transforms. Used only for debug.
 
@@ -229,35 +229,35 @@ def visualize_position(
     msg.header.seq = seq
 
     # sending transform
-    br.sendTransform(msg)
+    tf_broadcaster.sendTransform(msg)
 
 
-def translate(value, leftMin, leftMax, rightMin, rightMax) -> float:
+def translate(value, left_min, left_max, right_min, right_max) -> float:
     """Function proportionaly translating value from one interval into second interval.
 
     Args:
         value: value to be translated
-        leftMin: minimal value of the first interval
-        leftMax: maximal value of the first interval
-        rightMin: minimal value of the second interval
-        rightMax: maximal value of the second interval
+        left_min: minimal value of the first interval
+        left_max: maximal value of the first interval
+        right_min: minimal value of the second interval
+        right_max: maximal value of the second interval
 
     Returns:
         ans: translated `value` in second interval
     """
 
     # placing the value in the first interval boundaries
-    value = min(max(value, leftMin), leftMax)
+    value = min(max(value, left_min), left_max)
 
     # Figure out how 'wide' each range is
-    leftSpan = leftMax - leftMin
-    rightSpan = rightMax - rightMin
+    left_span = left_max - left_min
+    right_span = right_max - right_min
 
     # Convert the left range into a 0-1 range (float)
-    valueScaled = float(value - leftMin) / float(leftSpan)
+    value_scaled = float(value - left_min) / float(left_span)
 
     # Convert the 0-1 range into a value in the right range.
-    ans = rightMin + (valueScaled * rightSpan)
+    ans = right_min + (value_scaled * right_span)
     return ans
 
 
@@ -287,11 +287,11 @@ def calculate_threshold_distances(marker: MarkerPose) -> tuple[float, float]:
     perpend_coeff_b = 0.0
 
     # getting crssing point of the two lines
-    x = (perpend_coeff_b - coeff_b) / (coeff_a - perpend_coeff_a)
-    y = coeff_a * x + coeff_b
+    x_cross = (perpend_coeff_b - coeff_b) / (coeff_a - perpend_coeff_a)
+    y_cross = coeff_a * x_cross + coeff_b
 
-    y_dist = math.sqrt(x ** 2 + y ** 2)
+    y_dist = math.sqrt(x_cross ** 2 + y_cross ** 2)
 
-    x_dist = math.sqrt((x - position.x()) ** 2 + (y - position.y()) ** 2)
+    x_dist = math.sqrt((x_cross - position.x()) ** 2 + (y_cross - position.y()) ** 2)
 
     return x_dist, y_dist

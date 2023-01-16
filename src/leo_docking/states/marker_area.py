@@ -220,7 +220,7 @@ class BaseDockAreaState(smach.State):
         route_left = math.fabs(route_left)
         msg = Twist()
 
-        r = rospy.Rate(10)
+        rate = rospy.Rate(10)
 
         while True:
             with self.route_lock:
@@ -245,7 +245,7 @@ class BaseDockAreaState(smach.State):
                     return "preempted"
 
                 self.cmd_vel_pub.publish(msg)
-            r.sleep()
+            rate.sleep()
 
         self.cmd_vel_pub.publish(Twist())
 
