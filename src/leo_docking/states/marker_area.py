@@ -83,12 +83,12 @@ class CheckArea(smach.State):
         self.marker_sub.unregister()
         return super().service_preempt()
 
-    def execute(self, user_data):
+    def execute(self, ud):
         """Main state method invoked on state entered.
         Checks rover position and eventually calculates target pose of the rover.
         """
         self.marker_flag.clear()
-        self.marker_id = user_data.action_goal.marker_id
+        self.marker_id = ud.action_goal.marker_id
         self.marker_sub = rospy.Subscriber(
             "marker_detections", MarkerDetection, self.marker_callback, queue_size=1
         )
@@ -98,7 +98,7 @@ class CheckArea(smach.State):
         # if desired marker is not seen
         if not self.marker_flag.wait(self.timeout):
             rospy.logerr(f"Marker (id: {self.marker_id}) lost. Docking failed.")
-            user_data.action_result.result = (
+            ud.action_result.result = (
                 f"{self.state_log_name}: Marker lost. Docking failed."
             )
             # if preempt request came during waiting for the marker detection
@@ -110,7 +110,7 @@ class CheckArea(smach.State):
 
         if self.preempt_requested():
             self.service_preempt()
-            user_data.action_result.result = f"{self.state_log_name}: state preempted."
+            ud.action_result.result = f"{self.state_log_name}: state preempted."
             return "preempted"
 
         # calculating the length of distances needed for threshold checking
@@ -118,7 +118,7 @@ class CheckArea(smach.State):
 
         if self.check_threshold(x_dist, y_dist):
             self.marker_sub.unregister()
-            user_data.action_feedback.current_state = (
+            ud.action_feedback.current_state = (
                 f"{self.state_log_name}: docking possible from current position. "
                 f"Proceeding to 'Reaching Docking Point` sequence."
             )
@@ -134,9 +134,9 @@ class CheckArea(smach.State):
         self.marker_sub.unregister()
 
         # passing calculated data to next states
-        user_data.target_pose = target_pose
+        ud.target_pose = target_pose
 
-        user_data.action_feedback.current_state = (
+        ud.action_feedback.current_state = (
             f"{self.state_log_name}: docking impossible from current position. "
             f"Proceeding to 'Reaching Docking Area` sequence."
         )
@@ -250,7 +250,7 @@ class BaseDockAreaState(smach.State):
 
         return None
 
-    def execute(self, user_data):
+    def execute(self, ud):
         """Main state method, executed automatically on state entered"""
         self.odom_flag.clear()
         self.odom_reference = None
@@ -264,7 +264,7 @@ class BaseDockAreaState(smach.State):
         if not self.odom_flag.wait(self.timeout):
             self.wheel_odom_sub.unregister()
             rospy.logerr("Didn't get wheel odometry message. Docking failed.")
-            user_data.action_result.result = (
+            ud.action_result.result = (
                 f"{self.state_log_name}: wheel odometry not working. Docking failed."
             )
             # if preempt request came during waiting for an odometry message
@@ -276,13 +276,13 @@ class BaseDockAreaState(smach.State):
 
         self.cmd_vel_pub = rospy.Publisher("cmd_vel", Twist, queue_size=1)
 
-        target_pose: PyKDL.Frame = user_data.target_pose
+        target_pose: PyKDL.Frame = ud.target_pose
         # calculating route left
         route_left = self.calculate_route_left(target_pose)
         # moving the rover
         outcome = self.movement_loop(route_left, self.angle)
         if outcome:
-            user_data.action_result.result = f"{self.state_log_name}: state preempted."
+            ud.action_result.result = f"{self.state_log_name}: state preempted."
             return "preempted"
 
         self.cmd_vel_pub.unregister()
@@ -290,9 +290,9 @@ class BaseDockAreaState(smach.State):
 
         # passing the data to next state
         if self.output_len > 0:
-            user_data.target_pose = target_pose
+            ud.target_pose = target_pose
 
-        user_data.action_feedback.current_state = (
+        ud.action_feedback.current_state = (
             f"'Reaching Docking Area`: sequence completed. "
             f"Proceeding to 'Check Area' state."
         )

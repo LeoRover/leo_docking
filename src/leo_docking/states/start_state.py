@@ -47,10 +47,10 @@ class StartState(smach.State):
         self.marker_sub.unregister()
         return super().service_preempt()
 
-    def execute(self, user_data):
+    def execute(self, ud):
         """Main state method, executed automatically on state entered"""
         self.marker_flag.clear()
-        self.marker_id = user_data.action_goal.marker_id
+        self.marker_id = ud.action_goal.marker_id
         rospy.loginfo(
             f"Waiting for marker detection. Required marker_id: {self.marker_id}"
         )
@@ -63,7 +63,7 @@ class StartState(smach.State):
         if not self.marker_flag.wait(self.timeout):
             self.marker_sub.unregister()
             rospy.logerr("Didn't find a marker. Docking failed.")
-            user_data.action_result.result = (
+            ud.action_result.result = (
                 f"{self.state_log_name}: didn't find a marker. Docking failed."
             )
             # if preempt request came during waiting for the marker detection
@@ -75,12 +75,12 @@ class StartState(smach.State):
 
         if self.preempt_requested():
             self.service_preempt()
-            user_data.action_result.result = f"{self.state_log_name}: state preempted."
+            ud.action_result.result = f"{self.state_log_name}: state preempted."
             return "preempted"
 
         self.marker_sub.unregister()
 
-        user_data.action_feedback.current_state = (
+        ud.action_feedback.current_state = (
             f"{self.state_log_name}: marker with id: {self.marker_id} found. "
             f"Proceeding to 'Check Area' state."
         )

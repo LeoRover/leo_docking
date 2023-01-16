@@ -199,13 +199,13 @@ class BaseDockingState(smach.State):
             if self.odom_reference:
                 self.calculate_route_done(self.odom_reference, self.current_odom)
 
-    def execute(self, user_data):
+    def execute(self, ud):
         """Main state method, executed automatically on state entered"""
         self.odom_flag.clear()
         self.marker_flag.clear()
         self.current_odom = None
         self.odom_reference = None
-        self.marker_id = user_data.action_goal.marker_id
+        self.marker_id = ud.action_goal.marker_id
 
         self.marker_sub = rospy.Subscriber(
             "marker_detections", MarkerDetection, self.marker_callback, queue_size=1
@@ -219,9 +219,7 @@ class BaseDockingState(smach.State):
             rospy.logerr(f"Marker (id: {self.marker_id}) lost. Docking failed.")
             self.marker_sub.unregister()
             self.wheel_odom_sub.unregister()
-            user_data.action_result = (
-                f"{self.state_log_name}: Marker lost. Docking failed."
-            )
+            ud.action_result = f"{self.state_log_name}: Marker lost. Docking failed."
             # if preempt request came during waiting for the marker detection
             # it won't be handled if the marker is not seen, but the request will stay and
             # will be handled in the next call to the state machine, so there is need to
@@ -233,7 +231,7 @@ class BaseDockingState(smach.State):
             self.marker_sub.unregister()
             self.wheel_odom_sub.unregister()
             rospy.logerr("Didn't get wheel odometry message. Docking failed.")
-            user_data.action_result.result = (
+            ud.action_result.result = (
                 f"{self.state_log_name}: wheel odometry not working. Docking failed."
             )
             # if preempt request came during waiting for an odometry message
@@ -247,19 +245,19 @@ class BaseDockingState(smach.State):
 
         outcome = self.movement_loop()
         if outcome:
-            user_data.action_result.result = f"{self.state_log_name}: state preempted."
+            ud.action_result.result = f"{self.state_log_name}: state preempted."
             return "preempted"
 
         self.wheel_odom_sub.unregister()
         self.marker_sub.unregister()
         self.vel_pub.unregister()
 
-        user_data.action_feedback.current_state = (
+        ud.action_feedback.current_state = (
             f"'Reaching Docking Point': sequence completed. "
             f"Proceeding to 'Docking Rover' state."
         )
         if self.state_log_name == "Docking Rover":
-            user_data.action_result.result = "docking succeeded. Rover docked."
+            ud.action_result.result = "docking succeeded. Rover docked."
         return "succeeded"
 
     def service_preempt(self):
