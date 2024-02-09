@@ -21,6 +21,7 @@
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>nav_msgs</exec_depend>
   <exec_depend>aruco_opencv</exec_depend>
+  <exec_depend>aruco_opencv_msgs</exec_depend>
   <exec_depend>nodelet</exec_depend>
 
   <depend>actionlib_msgs</depend>
